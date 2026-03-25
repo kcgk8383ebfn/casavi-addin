@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Casavi Vorgang</title>
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=Syne+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f6f2;
+      --surface: #ffffff;
+      --border: #e2e0d8;
+      --accent: #1a1a2e;
+      --accent2: #c8a96e;
+      --text: #1a1a2e;
+      --text-muted: #8a8880;
+      --success: #2d7a4f;
+      --success-bg: #eaf5ee;
+      --error: #c0392b;
+      --error-bg: #fdf0ee;
+      --radius: 6px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--accent);
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header-logo {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.04em;
+    }
+    .header-logo span {
+      color: var(--accent2);
+    }
+    .header-badge {
+      font-family: 'Syne Mono', monospace;
+      font-size: 9px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* VIEWS */
+    .view { display: none; padding: 16px; }
+    .view.active { display: block; }
+
+    /* LOADING */
+    #view-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      gap: 12px;
+    }
+    .spinner {
+      width: 28px; height: 28px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text {
+      font-family: 'Syne Mono', monospace;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* EMAIL PREVIEW */
+    .section-label {
+      font-family: 'Syne Mono', monospace;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .email-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      margin-bottom: 14px;
+    }
+    .email-subject {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .email-from {
+      font-family: 'Syne Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .email-body {
+      font-size: 11px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      max-height: 80px;
+      overflow: hidden;
+      position: relative;
+    }
+    .email-body::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 24px;
+      background: linear-gradient(transparent, var(--surface));
+    }
+
+    /* AI BADGE */
+    .ai-banner {
+      background: linear-gradient(135deg, #1a1a2e 0%, #2d2d4e 100%);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ai-icon {
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .ai-text {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.4;
+    }
+    .ai-text strong { color: var(--accent2); }
+
+    /* FORM */
+    .form-group {
+      margin-bottom: 12px;
+    }
+    label {
+      display: block;
+      font-family: 'Syne Mono', monospace;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    input, textarea, select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      color: var(--text);
+      transition: border-color 0.15s;
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--accent);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+      line-height: 1.5;
+    }
+    select {
+      cursor: pointer;
+    }
+
+    /* CONTACT MATCH */
+    .match-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .match-card:hover { border-color: var(--accent); }
+    .match-card.selected {
+      border-color: var(--accent);
+      background: #f0f0f8;
+    }
+    .match-avatar {
+      width: 32px; height: 32px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .match-info { flex: 1; min-width: 0; }
+    .match-name {
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .match-detail {
+      font-family: 'Syne Mono', monospace;
+      font-size: 10px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .match-check {
+      font-size: 14px;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .match-card.selected .match-check { opacity: 1; }
+
+    .no-match {
+      background: #fff8ee;
+      border: 1px solid #f0d898;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 11px;
+      color: #8a6820;
+      margin-bottom: 12px;
+    }
+
+    /* PRIORITY */
+    .priority-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .prio-btn {
+      padding: 7px 4px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--surface);
+      cursor: pointer;
+      text-align: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 11px;
+      color: var(--text-muted);
+      transition: all 0.15s;
+    }
+    .prio-btn:hover { border-color: var(--accent); color: var(--text); }
+    .prio-btn.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .prio-btn .prio-icon { display: block; font-size: 14px; margin-bottom: 2px; }
+
+    /* SUBMIT BTN */
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      padding: 12px;
+      font-family: 'Syne', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      letter-spacing: 0.02em;
+      margin-top: 4px;
+    }
+    .btn-primary:hover { background: #2d2d4e; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:disabled {
+      background: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* SUCCESS */
+    #view-success {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 300px;
+      gap: 16px;
+      text-align: center;
+    }
+    #view-success.active {
+      display: flex;
+    }
+    .success-icon {
+      width: 56px; height: 56px;
+      background: var(--success-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      animation: pop 0.4s ease;
+    }
+    @keyframes pop {
+      0% { transform: scale(0.5); opacity: 0; }
+      70% { transform: scale(1.1); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .success-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--success);
+    }
+    .success-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      max-width: 220px;
+    }
+    .success-id {
+      font-family: 'Syne Mono', monospace;
+      font-size: 11px;
+      background: var(--success-bg);
+      color: var(--success);
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 8px 20px;
+      font-family: 'Syne', sans-serif;
+      font-size: 12px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--text); }
+
+    /* ERROR */
+    .error-banner {
+      background: var(--error-bg);
+      border: 1px solid #f0b8b0;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      font-size: 11px;
+      color: var(--error);
+      margin-bottom: 12px;
+      display: none;
+    }
+    .error-banner.visible { display: block; }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 14px 0;
+    }
+
+    /* CASAVI LINK */
+    .casavi-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      transition: all 0.15s;
+      margin-top: 8px;
+    }
+    .casavi-link:hover { border-color: var(--accent); color: var(--text); }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">bobbe <span>×</span> casavi</div>
+  <div class="header-badge">Vorgang erstellen</div>
+</div>
+
+<!-- LOADING -->
+<div id="view-loading" class="view active" style="display:flex;">
+  <div class="spinner"></div>
+  <div class="loading-text">E-Mail wird geladen…</div>
+</div>
+
+<!-- MAIN FORM -->
+<div id="view-form" class="view">
+
+  <div class="section-label">Aktuelle E-Mail</div>
+  <div class="email-card">
+    <div class="email-subject" id="email-subject">–</div>
+    <div class="email-from" id="email-from">–</div>
+    <div class="email-body" id="email-body">–</div>
+  </div>
+
+  <div class="ai-banner">
+    <div class="ai-icon">✦</div>
+    <div class="ai-text">KI hat Titel und Beschreibung <strong>automatisch vorausgefüllt</strong>. Bitte prüfen und ggf. anpassen.</div>
+  </div>
+
+  <div class="error-banner" id="error-banner"></div>
+
+  <!-- KONTAKT MATCH -->
+  <div class="form-group">
+    <label>Kontakt in Casavi</label>
+    <div id="contact-result">
+      <div class="loading-text" style="padding:8px 0;">Suche Kontakt…</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- TITEL -->
+  <div class="form-group">
+    <label>Titel des Vorgangs *</label>
+    <input type="text" id="field-title" placeholder="z.B. Heizungsausfall EG links">
+  </div>
+
+  <!-- BESCHREIBUNG -->
+  <div class="form-group">
+    <label>Beschreibung</label>
+    <textarea id="field-description" placeholder="Details zum Vorgang…"></textarea>
+  </div>
+
+  <!-- KATEGORIE -->
+  <div class="form-group">
+    <label>Kategorie</label>
+    <select id="field-category">
+      <option value="">– Kategorie wählen –</option>
+      <option value="schadensmeldung">Schadensmeldung</option>
+      <option value="anfrage">Allgemeine Anfrage</option>
+      <option value="beschwerde">Beschwerde</option>
+      <option value="handwerker">Handwerkerauftrag</option>
+      <option value="nebenkosten">Nebenkosten</option>
+      <option value="kuendigung">Kündigung</option>
+      <option value="sonstiges">Sonstiges</option>
+    </select>
+  </div>
+
+  <!-- PRIORITÄT -->
+  <div class="form-group">
+    <label>Priorität</label>
+    <div class="priority-row">
+      <div class="prio-btn" data-prio="low" onclick="selectPrio(this)">
+        <span class="prio-icon">🟢</span>Normal
+      </div>
+      <div class="prio-btn" data-prio="medium" onclick="selectPrio(this)">
+        <span class="prio-icon">🟡</span>Wichtig
+      </div>
+      <div class="prio-btn selected" data-prio="high" onclick="selectPrio(this)">
+        <span class="prio-icon">🔴</span>Dringend
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="btn-submit" onclick="submitVorgang()">
+    Vorgang in Casavi erstellen →
+  </button>
+
+</div>
+
+<!-- SUCCESS -->
+<div id="view-success" class="view">
+  <div class="success-icon">✓</div>
+  <div class="success-title">Vorgang erstellt!</div>
+  <div class="success-sub" id="success-detail">Der Vorgang wurde erfolgreich in Casavi angelegt.</div>
+  <div class="success-id" id="success-id"></div>
+  <button class="btn-secondary" onclick="resetForm()">Neuen Vorgang erstellen</button>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const PROXY_BASE = 'https://bobbe-casavi-proxy.azurewebsites.net'; // Azure Function URL (später ersetzen)
+const CASAVI_KEY = '88b3b397-5c36-43aa-a07c-7bb9a8e021eb';
+const CASAVI_SECRET = '16cf8a26-a240-4aed-8d72-16c07e87410f';
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let selectedContactId = null;
+let selectedPropertyId = null;
+let selectedPrio = 'high';
+let emailData = {};
+
+// ── OFFICE INIT ───────────────────────────────────────────────────────────────
+Office.onReady(async (info) => {
+  if (info.host === Office.HostType.Outlook) {
+    await loadEmail();
+  }
+});
+
+async function loadEmail() {
+  try {
+    const item = Office.context.mailbox.item;
+
+    // Betreff
+    const subject = item.subject || '(kein Betreff)';
+
+    // Absender
+    const sender = item.from;
+    const senderName = sender?.displayName || '';
+    const senderEmail = sender?.emailAddress || '';
+
+    // Body als Text
+    item.body.getAsync(Office.CoercionType.Text, async (result) => {
+      const bodyText = result.value || '';
+      const bodyPreview = bodyText.replace(/\s+/g, ' ').trim().substring(0, 400);
+
+      emailData = { subject, senderName, senderEmail, bodyText, bodyPreview };
+
+      // UI befüllen
+      document.getElementById('email-subject').textContent = subject;
+      document.getElementById('email-from').textContent =
+        senderName ? `${senderName} <${senderEmail}>` : senderEmail;
+      document.getElementById('email-body').textContent = bodyPreview;
+
+      // KI-Vorschlag für Titel & Beschreibung
+      await generateAISuggestion(subject, bodyText);
+
+      // Kontakt suchen
+      await findContact(senderEmail, senderName);
+
+      showView('form');
+    });
+
+  } catch (err) {
+    showError('E-Mail konnte nicht geladen werden: ' + err.message);
+    showView('form');
+  }
+}
+
+// ── KI VORSCHLAG ──────────────────────────────────────────────────────────────
+async function generateAISuggestion(subject, body) {
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 300,
+        messages: [{
+          role: 'user',
+          content: `Du bist ein Assistent für eine Hausverwaltung. Analysiere diese E-Mail und erstelle:
+1. Einen kurzen Vorgangstitel (max 60 Zeichen, präzise)
+2. Eine strukturierte Beschreibung (2-3 Sätze, sachlich)
+3. Die passende Kategorie aus: schadensmeldung, anfrage, beschwerde, handwerker, nebenkosten, kuendigung, sonstiges
+
+Betreff: ${subject}
+Inhalt: ${body.substring(0, 800)}
+
+Antworte NUR als JSON: {"title":"...","description":"...","category":"..."}`
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+    const clean = text.replace(/```json|```/g, '').trim();
+    const parsed = JSON.parse(clean);
+
+    document.getElementById('field-title').value = parsed.title || subject;
+    document.getElementById('field-description').value = parsed.description || '';
+
+    if (parsed.category) {
+      const sel = document.getElementById('field-category');
+      for (let opt of sel.options) {
+        if (opt.value === parsed.category) {
+          sel.value = parsed.category;
+          break;
+        }
+      }
+    }
+
+    // Priorität automatisch erkennen
+    const urgentWords = ['dringend', 'sofort', 'notfall', 'ausfall', 'defekt', 'kaputt', 'wasser', 'heizung'];
+    const isUrgent = urgentWords.some(w =>
+      (subject + body).toLowerCase().includes(w)
+    );
+    if (!isUrgent) {
+      selectPrioByValue('low');
+    }
+
+  } catch (err) {
+    // Fallback: Betreff als Titel
+    document.getElementById('field-title').value = subject;
+  }
+}
+
+// ── KONTAKT SUCHEN ────────────────────────────────────────────────────────────
+async function findContact(email, name) {
+  const container = document.getElementById('contact-result');
+
+  try {
+    // Casavi Auth Token holen via Proxy
+    const authRes = await fetch(`${PROXY_BASE}/api/casavi-auth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: CASAVI_KEY, secret: CASAVI_SECRET })
+    });
+
+    if (!authRes.ok) throw new Error('Auth fehlgeschlagen');
+    const { token } = await authRes.json();
+
+    // Kontakt per E-Mail suchen
+    const contactRes = await fetch(
+      `${PROXY_BASE}/api/casavi-proxy?path=/contacts&email=${encodeURIComponent(email)}`,
+      { headers: { 'casavi-token': token } }
+    );
+
+    const contacts = await contactRes.json();
+
+    if (contacts && contacts.length > 0) {
+      container.innerHTML = contacts.slice(0, 3).map(c => `
+        <div class="match-card" onclick="selectContact(this, '${c.id}', '${c.propertyId || ''}')" data-id="${c.id}">
+          <div class="match-avatar">${(c.firstName || c.name || '?')[0].toUpperCase()}</div>
+          <div class="match-info">
+            <div class="match-name">${c.firstName ? c.firstName + ' ' + (c.lastName || '') : c.name || 'Unbekannt'}</div>
+            <div class="match-detail">${c.propertyName || c.propertyId || 'Liegenschaft unbekannt'}</div>
+          </div>
+          <div class="match-check">✓</div>
+        </div>
+      `).join('');
+
+      // Ersten automatisch auswählen
+      const first = container.querySelector('.match-card');
+      if (first) first.click();
+
+    } else {
+      container.innerHTML = `
+        <div class="no-match">
+          ⚠ Kein Casavi-Kontakt für <strong>${email}</strong> gefunden.<br>
+          Vorgang wird ohne Kontaktzuordnung erstellt.
+        </div>`;
+    }
+
+  } catch (err) {
+    // Proxy noch nicht eingerichtet → Hinweis anzeigen
+    container.innerHTML = `
+      <div class="no-match">
+        ⚙ Proxy-Server noch nicht eingerichtet.<br>
+        Vorgang wird ohne Kontaktzuordnung erstellt.
+      </div>`;
+  }
+}
+
+function selectContact(el, contactId, propertyId) {
+  document.querySelectorAll('.match-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedContactId = contactId;
+  selectedPropertyId = propertyId;
+}
+
+// ── PRIORITÄT ─────────────────────────────────────────────────────────────────
+function selectPrio(el) {
+  document.querySelectorAll('.prio-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPrio = el.dataset.prio;
+}
+
+function selectPrioByValue(val) {
+  const btn = document.querySelector(`.prio-btn[data-prio="${val}"]`);
+  if (btn) selectPrio(btn);
+}
+
+// ── SUBMIT ────────────────────────────────────────────────────────────────────
+async function submitVorgang() {
+  const title = document.getElementById('field-title').value.trim();
+  const description = document.getElementById('field-description').value.trim();
+  const category = document.getElementById('field-category').value;
+
+  if (!title) {
+    showError('Bitte einen Titel eingeben.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.textContent = 'Wird erstellt…';
+  hideError();
+
+  try {
+    // Auth
+    const authRes = await fetch(`${PROXY_BASE}/api/casavi-auth`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: CASAVI_KEY, secret: CASAVI_SECRET })
+    });
+
+    if (!authRes.ok) throw new Error('Authentifizierung fehlgeschlagen');
+    const { token } = await authRes.json();
+
+    // Vorgang erstellen
+    const payload = {
+      title,
+      description: description || emailData.bodyPreview,
+      priority: selectedPrio,
+      category: category || 'sonstiges',
+      source: 'email',
+      sourceEmailSubject: emailData.subject,
+      sourceEmailFrom: emailData.senderEmail,
+    };
+
+    if (selectedContactId) payload.contactId = selectedContactId;
+    if (selectedPropertyId) payload.propertyId = selectedPropertyId;
+
+    const createRes = await fetch(`${PROXY_BASE}/api/casavi-proxy?path=/tickets`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'casavi-token': token
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!createRes.ok) {
+      const errText = await createRes.text();
+      throw new Error('Casavi Fehler: ' + errText);
+    }
+
+    const result = await createRes.json();
+
+    // Erfolg
+    document.getElementById('success-detail').textContent =
+      `"${title}" wurde in Casavi angelegt.`;
+    document.getElementById('success-id').textContent =
+      result.id ? `Vorgang #${result.id}` : 'Vorgang erstellt';
+
+    showView('success');
+
+  } catch (err) {
+    showError(err.message);
+    btn.disabled = false;
+    btn.textContent = 'Vorgang in Casavi erstellen →';
+  }
+}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => {
+    v.classList.remove('active');
+    v.style.display = 'none';
+  });
+  const el = document.getElementById(`view-${name}`);
+  if (el) {
+    el.classList.add('active');
+    el.style.display = name === 'success' ? 'flex' : 'block';
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-banner');
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('visible');
+}
+
+function hideError() {
+  document.getElementById('error-banner').classList.remove('visible');
+}
+
+function resetForm() {
+  selectedContactId = null;
+  selectedPropertyId = null;
+  showView('loading');
+  loadEmail();
+}
+</script>
+</body>
+</html>

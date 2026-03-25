@@ -12,12 +12,12 @@
   <DefaultLocale>de-DE</DefaultLocale>
   <DisplayName DefaultValue="Casavi Vorgang"/>
   <Description DefaultValue="E-Mail mit einem Klick als Casavi-Vorgang anlegen"/>
-  <IconUrl DefaultValue="https://bobbe-hausverwaltung.github.io/casavi-addin/icon-64.png"/>
-  <HighResolutionIconUrl DefaultValue="https://bobbe-hausverwaltung.github.io/casavi-addin/icon-128.png"/>
-  <SupportUrl DefaultValue="https://bobbe-hausverwaltung.de"/>
+  <IconUrl DefaultValue="https://kcgk8383ebfn.github.io/casavi-addin/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://kcgk8383ebfn.github.io/casavi-addin/icon-128.png"/>
+  <SupportUrl DefaultValue="https://kcgk8383ebfn.github.io/casavi-addin/"/>
 
   <AppDomains>
-    <AppDomain>https://bobbe-hausverwaltung.github.io</AppDomain>
+    <AppDomain>https://kcgk8383ebfn.github.io</AppDomain>
     <AppDomain>https://bobbe-casavi-proxy.azurewebsites.net</AppDomain>
   </AppDomains>
 
@@ -34,7 +34,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://bobbe-hausverwaltung.github.io/casavi-addin/taskpane.html"/>
+        <SourceLocation DefaultValue="https://kcgk8383ebfn.github.io/casavi-addin/taskpane.html"/>
         <RequestedHeight>450</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -93,13 +93,13 @@
 
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://bobbe-hausverwaltung.github.io/casavi-addin/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://bobbe-hausverwaltung.github.io/casavi-addin/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://bobbe-hausverwaltung.github.io/casavi-addin/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://kcgk8383ebfn.github.io/casavi-addin/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://kcgk8383ebfn.github.io/casavi-addin/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://kcgk8383ebfn.github.io/casavi-addin/icon-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Commands.Url" DefaultValue="https://bobbe-hausverwaltung.github.io/casavi-addin/commands.html"/>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://bobbe-hausverwaltung.github.io/casavi-addin/taskpane.html"/>
+        <bt:Url id="Commands.Url" DefaultValue="https://kcgk8383ebfn.github.io/casavi-addin/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://kcgk8383ebfn.github.io/casavi-addin/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel" DefaultValue="bobbe"/>

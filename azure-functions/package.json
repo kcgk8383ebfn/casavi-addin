@@ -1,0 +1,12 @@
+{
+  "name": "casavi-outlook-addin-functions",
+  "version": "1.0.0",
+  "description": "Azure Functions fuer Casavi Outlook Add-in",
+  "main": "index.js",
+  "scripts": { "start": "func start", "test": "echo \"No tests yet\"" },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": { "node": ">=18" }
+}
